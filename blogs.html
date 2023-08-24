@@ -39,6 +39,7 @@
 <script> 
 
   let container = document.getElementById("container");
+  let loginUsername=localStorage.getItem("username")
 
   document.getElementById("category-filter").addEventListener("change", () => {
     category_filter = document.getElementById("category-filter").value;
@@ -55,7 +56,7 @@
     let sortBy = document.getElementById("dateFilter").value;
     let title = document.getElementById("search").value;
     console.log("sortby",sortBy)
-    fetch(`http://localhost:8000/api/blogs?title=${title}&category=${category_filter}&sortBy=${sortBy}`,{
+    fetch(`https://fair-puce-scallop-suit.cyclic.cloud/api/blogs?title=${title}&category=${category_filter}&sortBy=${sortBy}`,{
       method:"GET",
         headers:{
             "Content-type":"application/json",
@@ -93,9 +94,10 @@
       date.innerText = new Date(element.date).toISOString().split('T')[0];
       likeBtn=document.createElement("button")
       likeBtn.innerText="Like"
+
       likeBtn.addEventListener("click",()=>{
-        console.log("like")
-        fetch(`http://localhost:8000/api/blogs/${element._id}`, {
+        console.log(element.comments)
+        fetch(`https://fair-puce-scallop-suit.cyclic.cloud/api/blogs/${element._id}`, {
           method: "PATCH",
           headers: {
             Authorization: localStorage.getItem("token"),
@@ -112,33 +114,50 @@
       })
       let likes = document.createElement("p");
       likes.innerText = element.likes;
-      let comments = document.createElement("div");
 
-      console.log(element.comments)
+      let comments = document.createElement("div");    
+      let commentBtn=document.createElement("button")
+      let commentContent=document.createElement("input")
+      commentBtn.innerText=" Add Comment";
+      commentBtn.addEventListener("click",()=>{
+        let obj={}
+        obj["username"]=loginUsername;
+        obj["content"]=commentContent.value;
+        element.comments.push(obj)
+        fetch(`https://fair-puce-scallop-suit.cyclic.cloud/api/blogs/${element._id}`, {
+          method: "PATCH",
+          headers: {
+            Authorization: localStorage.getItem("token"),
+            "Content-Type":"application/json"
+          },
+          body: JSON.stringify({comments:element.comments}),
+        })
+          .then((res) => res.json())
+          .then((res) => {
+            fetchData();
+            console.log(res);
+          })
+          .catch((err) => console.log(err));
+      })
   
       element.comments.forEach((e)=>{
         let commentContainer = document.createElement("div");
-
+        commentContainer.setAttribute("id","comment-container")
+        let commentImg=document.createElement("img");
+        commentImg.src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThsyVVdxkz5zyuE-yRKpdwtre_R234HkS2gQ&usqp=CAU"
         let commentName = document.createElement("p");
         commentName.innerText = e.username;
-
         let commentText = document.createElement("p");
-        commentText.innerText = e.content;
-
-        // Append the name and text to the comment container
-        commentContainer.appendChild(commentName);
-        commentContainer.appendChild(commentText);
-
-        // Append the comment container to the comments section
+        commentText.innerText = e.content;       
+        commentContainer.append(commentImg,commentName,commentText);
         comments.appendChild(commentContainer);
-
       })
       let editBtn = document.createElement("button");
       editBtn.innerText = "EDIT";
       let deleteBtn = document.createElement("button");
       deleteBtn.innerText = "DELETE";
       deleteBtn.addEventListener("click", () => {
-        fetch(`http://localhost:8000/api/blogs/${element._id}`, {
+        fetch(`https://fair-puce-scallop-suit.cyclic.cloud/api/blogs/${element._id}`, {
           method: "DELETE",
           headers: {
             Authorization: localStorage.getItem("token"),
@@ -164,8 +183,10 @@
         title,  
         content,
         likeBtn,            
-        likes,
-        comments
+        likes,        
+        commentBtn,
+        commentContent,
+        comments,
       );
       container.append(card);
     });

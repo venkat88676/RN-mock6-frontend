@@ -45,3 +45,12 @@ input{
     display: flex;
     justify-content: space-between;
 }
+#comment-container{
+    background-color: rgba(127, 193, 255, 0.358);
+    display: flex;
+    justify-content: space-around;
+}
+#comment-container img{
+    width:30px;
+    border-radius: 100%;
+}
