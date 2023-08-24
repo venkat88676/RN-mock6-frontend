@@ -1,0 +1,1 @@
+# RN-mock6-frontend
