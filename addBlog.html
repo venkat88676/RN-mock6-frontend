@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <nav>
+        <a href="./index.html">Sign Up</a>
+        <a href="./signIn.html">Sign In</a>
+        <a href="./blogs.html">Blog</a>
+      </nav>
+    <div id="post-form">
+        <input type="text" id="username" >
+        <input type="text" id="title" placeholder="title">
+        <textarea id="content" id="" cols="55" rows="5" placeholder="Content..."></textarea >
+        <select  id="category">
+            <option value="">Select Category</option>
+            <option value="Business">Business</option>
+            <option value="Tech">Tech</option>
+            <option value="Lifestyle">Lifestyle</option>
+            <option value="Entertainment">Entertainment</option>
+        </select>
+        <input type="date" id="date">
+        <button onclick="postData()">Post</button>
+    </div>
+</body>
+</html>
+
+<script>
+    document.getElementById("username").value=localStorage.getItem("username")
+    function postData(){
+        let payload = {
+        username: document.getElementById("username").value,
+        title: document.getElementById("title").value,
+        content:document.getElementById("content").value,
+        category:document.getElementById("category").value,
+        date:document.getElementById("date").value
+        };
+        fetch("http://localhost:8000/api/blogs",{
+            method:"POST",
+            headers: {
+            "Content-Type": "application/json",
+            "Authorization":localStorage.getItem("token")
+        },
+        body: JSON.stringify(payload),
+        })
+        .then((res)=>res.json())
+        .then((data)=>{
+            console.log(data);
+            alert("Post Added")
+        })
+        .catch((err)=>alert(err))
+
+    }
+</script>

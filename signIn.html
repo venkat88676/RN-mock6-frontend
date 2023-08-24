@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <nav>
+      <a href="./index.html">Sign Up</a>
+      <a href="./signIn.html">Sign In</a>
+      <a href="./blogs.html">Blog</a>
+    </nav>
+    <div id="signup-form">
+        <h3>Sign In</h3>
+        <input type="email" id="signEmail" placeholder="Email" />
+        <input type="password" id="signPassword" placeholder="password" />
+        <button id="signinBtn">Sign In</button>
+    </div>
+   
+  </body>
+</html>
+
+<script>
+  let signupBtn = document.getElementById("signinBtn");
+  signupBtn.addEventListener("click", () => {
+    let payload = {
+        email: document.getElementById("signEmail").value,
+        password: document.getElementById("signPassword").value,
+    };
+    fetch("http://localhost:8000/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if(res.msg==="User is not found"){
+          alert("User is not found")
+        }
+        else if(res.msg==="wrong credential"){
+          alert("wrong credential")
+        }
+        else{
+          localStorage.setItem("token",res.token)
+          localStorage.setItem("username",res.user.username)
+          alert("login successful")
+          window.location.href="./blogs.html"
+        }
+       
+      })
+      .catch((err) => alert(err));
+  });
+</script>

@@ -1,0 +1,47 @@
+nav{
+    background-color: rgb(0, 149, 255);
+  display: flex;
+  justify-content: space-evenly;
+  padding: 10px;
+}
+a{
+    text-decoration: none;
+    color: white;
+}
+#signup-form,#post-form{
+    text-align: center;
+    width: 40%;
+    margin: auto;
+    margin-top: 5%;
+    border:.2px  solid black
+}
+input{
+    width: 90%;
+    padding: 5px;
+    margin: 5px;
+}
+#filter{
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-evenly;
+}
+#filter input{
+    width: 20%;
+}
+#card{
+    border:.2px solid black;
+    padding: 15px;
+}
+#card img{
+    width: 100px;
+}
+#container{
+    margin-top:20px ;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 20px;
+}
+#top{
+    display: flex;
+    justify-content: space-between;
+}

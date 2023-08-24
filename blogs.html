@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <nav>
+      <a href="./index.html">Sign Up</a>
+      <a href="./signIn.html">Sign In</a>
+      <a href="./blogs.html">Blog</a>
+    </nav>
+    <div id="filter">
+      <input  type="text" id="search" placeholder="Search.." />
+      <button onclick="fetchData()">Search</button>
+      
+      <select name="" id="dateFilter">
+        <option value="">Sort By Date</option>
+        <option value="asc">Acending</option>
+        <option value="desc">Decending</option>
+      </select>
+
+      <select  id="category-filter">
+        <option value="">Select Category</option>
+        <option value="Business">Business</option>
+        <option value="Tech">Tech</option>
+        <option value="Lifestyle">Lifestyle</option>
+        <option value="Entertainment">Entertainment</option>
+    </select>
+    </div>
+    <a href="./addBlog.html"><button>Create Blog</button></a>
+    
+    <div id="container"></div>
+  </body>
+</html>
+
+<script> 
+
+  let container = document.getElementById("container");
+
+  document.getElementById("category-filter").addEventListener("change", () => {
+    category_filter = document.getElementById("category-filter").value;
+    fetchData();
+  });
+
+  document.getElementById("dateFilter").addEventListener("change", () => {
+    sortBy = document.getElementById("dateFilter").value;
+    fetchData();
+  });
+
+  function fetchData() {
+    let category_filter = document.getElementById("category-filter").value;
+    let sortBy = document.getElementById("dateFilter").value;
+    let title = document.getElementById("search").value;
+    console.log("sortby",sortBy)
+    fetch(`http://localhost:8000/api/blogs?title=${title}&category=${category_filter}&sortBy=${sortBy}`,{
+      method:"GET",
+        headers:{
+            "Content-type":"application/json",
+            "Authorization":localStorage.getItem("token")
+        }
+    }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+
+        display(data);
+      })
+      .catch((err) => console.log(err));
+  }
+  fetchData();
+
+
+  function display(data) {
+    container.innerText = null;
+    data.forEach((element) => {
+      let card = document.createElement("div");
+      card.setAttribute("id", "card");
+      let img=document.createElement("img");
+      img.src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmthgdxqKJq-AveIxl3_BY7xF32ePcl-FWPpd1YF91qnrZ_nW-tzZDTIRLy0qmVIan33k&usqp=CAU"
+      let username = document.createElement("h3");
+      username.innerText =element.username;       
+      let title = document.createElement("h2");
+      title.innerText = element.title;
+      let content = document.createElement("p");
+      content.innerText =element.content;
+      let category = document.createElement("p");
+      category.innerText = element.category;
+      let date = document.createElement("p");
+      date.innerText = new Date(element.date).toISOString().split('T')[0];
+      likeBtn=document.createElement("button")
+      likeBtn.innerText="Like"
+      likeBtn.addEventListener("click",()=>{
+        console.log("like")
+        fetch(`http://localhost:8000/api/blogs/${element._id}`, {
+          method: "PATCH",
+          headers: {
+            Authorization: localStorage.getItem("token"),
+            "Content-Type":"application/json"
+          },
+          body: JSON.stringify({likes:element.likes+1}),
+        })
+          .then((res) => res.json())
+          .then((res) => {
+            fetchData();
+            console.log(res);
+          })
+          .catch((err) => console.log(err));
+      })
+      let likes = document.createElement("p");
+      likes.innerText = element.likes;
+      let comments = document.createElement("div");
+
+      console.log(element.comments)
+  
+      element.comments.forEach((e)=>{
+        let commentContainer = document.createElement("div");
+
+        let commentName = document.createElement("p");
+        commentName.innerText = e.username;
+
+        let commentText = document.createElement("p");
+        commentText.innerText = e.content;
+
+        // Append the name and text to the comment container
+        commentContainer.appendChild(commentName);
+        commentContainer.appendChild(commentText);
+
+        // Append the comment container to the comments section
+        comments.appendChild(commentContainer);
+
+      })
+      let editBtn = document.createElement("button");
+      editBtn.innerText = "EDIT";
+      let deleteBtn = document.createElement("button");
+      deleteBtn.innerText = "DELETE";
+      deleteBtn.addEventListener("click", () => {
+        fetch(`http://localhost:8000/api/blogs/${element._id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        })
+          .then((res) => res.json())
+          .then((res) => {
+            alert("Post Deleted");
+            fetchData();
+            console.log(res);
+          })
+          .catch((err) => console.log(err));
+      });
+      let top=document.createElement("div")
+      let topRight=document.createElement("div")
+      let buttonCont=document.createElement("div");
+      buttonCont.append(editBtn,deleteBtn)
+      topRight.append(username,category,date);
+      top.setAttribute("id","top");      
+      top.append(img,topRight,buttonCont) 
+      card.append(
+        top ,                
+        title,  
+        content,
+        likeBtn,            
+        likes,
+        comments
+      );
+      container.append(card);
+    });
+  }
+
+</script>
